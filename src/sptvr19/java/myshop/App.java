@@ -1,5 +1,6 @@
 package sptvr19.java.myshop;
 
+import java.io.*;
 import java.util.Scanner;
 import java.util.Random;
 
@@ -13,8 +14,14 @@ class App {
     Random rand = new Random();
     Scanner scan = new Scanner(System.in);
     
+    int money = 300;        
+    Person pers = new Person(money);
+    
+    int ID1 = 0;
+    int ID2 = 0;
+    
     String names[] = {"Banana","Vodka","Sausage","Chair","Sofa","Pickaxe", "Knife"};    
-       
+      
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_BLACK = "\u001B[30m";
     public static final String ANSI_RED = "\u001B[31m";
@@ -25,16 +32,42 @@ class App {
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
     
-    public void run() {
+    public void run() throws Exception {
         System.out.println(ANSI_PURPLE + " ---------------" + ANSI_RESET);
         System.out.println(ANSI_PURPLE + "----- MyShop -----" + ANSI_RESET);
         System.out.println(ANSI_PURPLE + " ---------------" + ANSI_RESET);
         boolean work = true;
+           
+        FileReader fr = new FileReader("invent.txt");
+        Scanner fr_scan = new Scanner(fr);
         
-        reset();
+        String checking_array[] = new String[4];
+                    
+        while (fr_scan.hasNextLine()) {      
+            checking_array = fr_scan.nextLine().split(" ");
+            Thing this_thing = new Thing(checking_array[0],Integer.parseInt(checking_array[1]),Integer.parseInt(checking_array[2]),Integer.parseInt(checking_array[3]));
+                for (int i = 0; i < things.length; i++) {
+                    if (pers.getSpecialThings(i) != null && this_thing != null) { 
+                        ID1 = pers.getSpecialThings(i).getID();
+                        ID2 = this_thing.getID();
+                        if (ID1 == ID2) {
+                            Thing same = pers.getSpecialThings(i);
+                            same.addCount();                                       
+                            this_thing = null;
+                        }
+                    }
+                }
+                if (ID1 != ID2) {
+                    pers.setThings(this_thing);
+                }
+            }   
         
-        int money = 300;        
-        Person pers = new Person(money);
+        fr.close();
+        
+        reset();  
+        
+        FileWriter fw = new FileWriter("invent.txt");
+        String StringToWrite;
         
         while (work) {
             System.out.println(ANSI_YELLOW + "\n1. Buy an Item" + ANSI_RESET);
@@ -59,14 +92,20 @@ class App {
                             Thing this_thing = new Thing(things[choosed_item-1].getName(),1,things[choosed_item-1].getPrice(),things[choosed_item-1].getID());
                             for (int i = 0; i < things.length; i++) {
                                 if (pers.getSpecialThings(i) != null && this_thing != null) { 
-                                    int ID1 = pers.getSpecialThings(i).getID();
-                                    int ID2 = this_thing.getID();
+                                    ID1 = pers.getSpecialThings(i).getID();
+                                    ID2 = this_thing.getID();
                                     if (ID1 == ID2) {
                                             Thing same = pers.getSpecialThings(i);
-                                            same.addCount();
+                                            same.addCount();   
+                                            StringToWrite = (this_thing.getName() + " " + this_thing.getCount() + " " + this_thing.getPrice() + " " + this_thing.getID() + "\n");
+                                            fw.write(StringToWrite);
                                             this_thing = null;
                                     }
                                 }
+                            }
+                            if (ID1 != ID2) {
+                                StringToWrite = (this_thing.getName() + " " + this_thing.getCount() + " " + this_thing.getPrice() + " " + this_thing.getID() + "\n");
+                                fw.write(StringToWrite);
                             }
                             pers.setThings(this_thing);
                         } else {                        
@@ -80,9 +119,15 @@ class App {
                                     if (ID1 == ID2) {
                                         Thing same = pers.getSpecialThings(i);
                                         same.addCount();
+                                        StringToWrite = (this_thing.getName() + " " + this_thing.getCount() + " " + this_thing.getPrice() + " " + this_thing.getID() + "\n");
+                                        fw.write(StringToWrite);
                                         this_thing = null;
                                     }
                                 }
+                            }
+                            if (ID1 != ID2) {
+                                StringToWrite = (this_thing.getName() + " " + this_thing.getCount() + " " + this_thing.getPrice() + " " + this_thing.getID() + "\n");
+                                fw.write(StringToWrite);
                             }
                             pers.setThings(this_thing);
                         }
@@ -117,6 +162,7 @@ class App {
                     System.out.println(ANSI_YELLOW + "------------------------- " + ANSI_RESET);
                     break;
                 case 5:
+                    fw.close();
                     work = false;
                     break;
                 default: 
@@ -129,7 +175,7 @@ class App {
         }
     }
     
-    public void reset() {
+    public void reset() throws Exception {
         for (int i = 0; i < things.length-(rand.nextInt(things.length)); i++) {
             int random_name = rand.nextInt(names.length);
             int random_count = rand.nextInt(max_count) + 1;
@@ -222,10 +268,6 @@ class Person {
         for (int i = 0; i < this.selfthings.length; i++) {
             if (this.selfthings[i] == null) {
                 this.selfthings[i] = thing;                    
-                breakthis = true;
-            }
-            if (breakthis == true) {
-                breakthis = false;
                 break;
             }
         }             
