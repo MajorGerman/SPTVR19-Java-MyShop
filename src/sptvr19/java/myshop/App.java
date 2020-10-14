@@ -14,7 +14,7 @@ class App {
     Random rand = new Random();
     Scanner scan = new Scanner(System.in);
     
-    int money = 300;        
+    int money = 400;        
     Person pers = new Person(money);
     
     int ID1 = 0;
@@ -33,9 +33,9 @@ class App {
     public static final String ANSI_WHITE = "\u001B[37m";
     
     public void run() throws Exception {
-        System.out.println(ANSI_PURPLE + " ---------------" + ANSI_RESET);
-        System.out.println(ANSI_PURPLE + "----- MyShop -----" + ANSI_RESET);
-        System.out.println(ANSI_PURPLE + " ---------------" + ANSI_RESET);
+        System.out.println(ANSI_PURPLE + " ----------------" + ANSI_RESET);
+        System.out.println(ANSI_PURPLE + "------ MyShop ------" + ANSI_RESET);
+        System.out.println(ANSI_PURPLE + " ----------------" + ANSI_RESET);
         boolean work = true;
            
         FileReader fr = new FileReader("invent.txt");
@@ -46,28 +46,26 @@ class App {
         while (fr_scan.hasNextLine()) {      
             checking_array = fr_scan.nextLine().split(" ");
             Thing this_thing = new Thing(checking_array[0],Integer.parseInt(checking_array[1]),Integer.parseInt(checking_array[2]),Integer.parseInt(checking_array[3]));
-                for (int i = 0; i < things.length; i++) {
-                    if (pers.getSpecialThings(i) != null && this_thing != null) { 
-                        ID1 = pers.getSpecialThings(i).getID();
-                        ID2 = this_thing.getID();
-                        if (ID1 == ID2) {
-                            Thing same = pers.getSpecialThings(i);
-                            same.addCount();                                       
-                            this_thing = null;
-                        }
-                    }
-                }
-                if (ID1 != ID2) {
-                    pers.setThings(this_thing);
-                }
-            }   
-        
+                                            for (int i = 0; i < things.length; i++) {
+                                    if (pers.getSpecialThings(i) != null && this_thing != null) { 
+                                        ID1 = pers.getSpecialThings(i).getID();
+                                        ID2 = this_thing.getID();
+                                        if (ID1 == ID2) {
+                                                Thing same = pers.getSpecialThings(i);
+                                                same.addCount();   
+                                                this_thing = null;
+                                        }
+                                    }
+                                }
+            pers.setThings(this_thing);
+            }
+
         fr.close();
         
         reset();  
         
-        FileWriter fw = new FileWriter("invent.txt");
-        String StringToWrite;
+        String StringToWrite;   
+        FileWriter fw = new FileWriter("invent.txt", true);
         
         while (work) {
             System.out.println(ANSI_YELLOW + "\n1. Buy an Item" + ANSI_RESET);
@@ -83,58 +81,68 @@ class App {
                 case 1:
                     System.out.println(ANSI_YELLOW + "\n------------------------- " + ANSI_RESET);
                     System.out.print(ANSI_YELLOW + "Choose ID of item: " + ANSI_RESET);
-                    int choosed_item = scan.nextInt();                  
-                    if (pers.getMoney() >= things[choosed_item-1].getPrice()) {
-                        System.out.println(ANSI_GREEN + "You bought this item!" + ANSI_RESET);
-                        if (things[choosed_item-1].getCount() > 1) {
-                            things[choosed_item-1].setCount(things[choosed_item-1].getCount()-1);
-                            pers.setMoney(pers.getMoney()- things[choosed_item-1].getPrice());
-                            Thing this_thing = new Thing(things[choosed_item-1].getName(),1,things[choosed_item-1].getPrice(),things[choosed_item-1].getID());
-                            for (int i = 0; i < things.length; i++) {
-                                if (pers.getSpecialThings(i) != null && this_thing != null) { 
-                                    ID1 = pers.getSpecialThings(i).getID();
-                                    ID2 = this_thing.getID();
-                                    if (ID1 == ID2) {
+                    int choosed_item = scan.nextInt();     
+                    try {
+                        if (pers.getMoney() >= things[choosed_item-1].getPrice()) {
+                            System.out.println(ANSI_GREEN + "\nYou bought this item!" + ANSI_RESET);
+                            if (things[choosed_item-1].getCount() > 1) {
+                                things[choosed_item-1].setCount(things[choosed_item-1].getCount()-1);
+                                pers.setMoney(pers.getMoney()- things[choosed_item-1].getPrice());
+                                Thing this_thing = new Thing(things[choosed_item-1].getName(),1,things[choosed_item-1].getPrice(),things[choosed_item-1].getID());
+                                for (int i = 0; i < things.length; i++) {
+                                    if (pers.getSpecialThings(i) != null && this_thing != null) { 
+                                        ID1 = pers.getSpecialThings(i).getID();
+                                        ID2 = this_thing.getID();
+                                        if (ID1 == ID2) {
+                                                Thing same = pers.getSpecialThings(i);
+                                                same.addCount();   
+                                                StringToWrite = (String)(this_thing.getName() + " " + this_thing.getCount() + " " + this_thing.getPrice() + " " + (-1*this_thing.getID()-pers.getItemsCount()*rand.nextInt(10)) + "\n");
+                                                fw.write(StringToWrite);
+                                                this_thing = null;
+                                                fw.flush();
+                                        }
+                                    }
+                                }
+                                if (ID1 != ID2) {
+                                    StringToWrite = (String)(this_thing.getName() + " " + this_thing.getCount() + " " + this_thing.getPrice() + " " + (-1*this_thing.getID()-pers.getItemsCount()*rand.nextInt(10)) + "\n");
+                                    fw.write(StringToWrite);
+                                    fw.flush();
+                                }
+                                pers.setThings(this_thing);
+                            } else {                        
+                                pers.setMoney(pers.getMoney() - things[choosed_item-1].getPrice());
+                                Thing this_thing = new Thing(things[choosed_item-1].getName(),1,things[choosed_item-1].getPrice(),things[choosed_item-1].getID());
+                                things[choosed_item-1] = null;                            
+                                for (int i = 0; i < things.length; i++) {
+                                    if (pers.getSpecialThings(i) != null && this_thing != null) { 
+                                        int ID1 = pers.getSpecialThings(i).getID();
+                                        int ID2 = this_thing.getID();
+                                        if (ID1 == ID2) {
                                             Thing same = pers.getSpecialThings(i);
-                                            same.addCount();   
-                                            StringToWrite = (this_thing.getName() + " " + this_thing.getCount() + " " + this_thing.getPrice() + " " + this_thing.getID() + "\n");
+                                            same.addCount();
+                                            StringToWrite = (String)(this_thing.getName() + " " + this_thing.getCount() + " " + this_thing.getPrice() + " " + (-1*this_thing.getID()-pers.getItemsCount()*rand.nextInt(10)) + "\n");
                                             fw.write(StringToWrite);
                                             this_thing = null;
+                                            fw.flush();
+                                        }
                                     }
                                 }
-                            }
-                            if (ID1 != ID2) {
-                                StringToWrite = (this_thing.getName() + " " + this_thing.getCount() + " " + this_thing.getPrice() + " " + this_thing.getID() + "\n");
-                                fw.write(StringToWrite);
-                            }
-                            pers.setThings(this_thing);
-                        } else {                        
-                            pers.setMoney(pers.getMoney() - things[choosed_item-1].getPrice());
-                            Thing this_thing = new Thing(things[choosed_item-1].getName(),1,things[choosed_item-1].getPrice(),things[choosed_item-1].getID());
-                            things[choosed_item-1] = null;                            
-                            for (int i = 0; i < things.length; i++) {
-                                if (pers.getSpecialThings(i) != null && this_thing != null) { 
-                                    int ID1 = pers.getSpecialThings(i).getID();
-                                    int ID2 = this_thing.getID();
-                                    if (ID1 == ID2) {
-                                        Thing same = pers.getSpecialThings(i);
-                                        same.addCount();
-                                        StringToWrite = (this_thing.getName() + " " + this_thing.getCount() + " " + this_thing.getPrice() + " " + this_thing.getID() + "\n");
-                                        fw.write(StringToWrite);
-                                        this_thing = null;
-                                    }
+                                if (ID1 != ID2) {
+                                    StringToWrite = (String)(this_thing.getName() + " " + this_thing.getCount() + " " + this_thing.getPrice() + " " + (-1*this_thing.getID()-pers.getItemsCount()*rand.nextInt(10)) + "\n");
+                                    fw.write(StringToWrite);
+                                    fw.flush();
                                 }
+                                pers.setThings(this_thing);
                             }
-                            if (ID1 != ID2) {
-                                StringToWrite = (this_thing.getName() + " " + this_thing.getCount() + " " + this_thing.getPrice() + " " + this_thing.getID() + "\n");
-                                fw.write(StringToWrite);
-                            }
-                            pers.setThings(this_thing);
+                        } else {
+                            System.out.println(ANSI_RED + "You don't have enough money!" + ANSI_RESET);
                         }
-                    } else {
-                        System.out.println(ANSI_RED + "You don't have enough money!" + ANSI_RESET);
+                        System.out.println(ANSI_YELLOW + "------------------------- " + ANSI_RESET);
+                    } catch (Exception e) {
+                        System.out.println(ANSI_RED + "\nThere is no ID like inputed! " + ANSI_RESET);
+                        System.out.println(ANSI_YELLOW + "----------------------------------- " + ANSI_RESET);
+                        continue;
                     }
-                    System.out.println(ANSI_YELLOW + "------------------------- " + ANSI_RESET);
                     break;
                 case 2:
                     System.out.println(ANSI_YELLOW + "\n------------------------- " + ANSI_RESET);
@@ -233,8 +241,6 @@ class Thing {
         this.ID = ID;
     }
     
-    
-    
     @Override
     public String toString() {
         return ID + "/ " + name + " x " + count + " (" + price + "$" + ')';
@@ -244,7 +250,8 @@ class Thing {
 class Person {
     private int money;
     private boolean breakthis;
-    private Thing[] selfthings = new Thing[10];
+    private Thing[] selfthings = new Thing[20];
+    private int count;
     Person(int money) {
         this.money = money;
     }
@@ -260,6 +267,16 @@ class Person {
     public Thing getSpecialThings(int i) {
         return selfthings[i];
     }
+    
+    public int getItemsCount() {
+        for (int i = 0; i < this.selfthings.length; i++) {
+            if (selfthings[i] != null) {
+                count++;
+            }
+        }
+        return count;
+    }
+            
     public void setMoney(int money) {
         this.money = money;
     }
