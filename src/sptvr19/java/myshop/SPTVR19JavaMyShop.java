@@ -6,5 +6,4 @@ public class SPTVR19JavaMyShop {
         App app = new App();
         app.run();
     }
-    
 }
