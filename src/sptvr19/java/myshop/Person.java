@@ -6,6 +6,7 @@ public class Person {
     private boolean breakthis;
     private Thing[] selfthings = new Thing[20];
     private int count;
+    private String login;
     
     Person(int money) {
         this.money = money;
@@ -51,4 +52,15 @@ public class Person {
        }
        return "";
     }   
+
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+    
+    
+    
 }

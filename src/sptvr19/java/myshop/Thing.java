@@ -5,6 +5,7 @@ public class Thing {
     private int count = 0;
     private int price;
     private int ID;
+    private Person pers;
     Thing(String name, int count, int price, int ID) {
         this.name = name;
         this.count = count;
@@ -52,4 +53,13 @@ public class Thing {
     public String toString() {
         return ID + "/ " + name + " x " + count + " (" + price + "$" + ')';
     }   
+
+    public Person getPers() {
+        return pers;
+    }
+
+    public void setPers(Person pers) {
+        this.pers = pers;
+    }  
+    
 }
